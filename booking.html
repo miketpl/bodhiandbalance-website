@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book a Session — Bodhi & Balance</title>
+  <meta name="description" content="Book your healing session at Bodhi & Balance. Choose from reflexology, reiki, and other alternative therapies.">
+  <link rel="icon" href="images/logo_green.png" type="image/png">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* ═══════════ BOOKING PAGE STYLES ═══════════ */
+    .booking-container {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 60px;
+      margin-top: 60px;
+    }
+
+    .booking-form-wrapper {
+      max-width: 700px;
+    }
+
+    .booking-step {
+      display: none;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.4s var(--ease-gentle), transform 0.4s var(--ease-gentle);
+    }
+
+    .booking-step.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .step-header {
+      margin-bottom: 48px;
+    }
+
+    .step-number {
+      font-family: var(--font-heading);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+
+    .step-title {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      color: var(--green-deep);
+      margin-bottom: 8px;
+    }
+
+    .step-description {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ═══════════ TREATMENT CARDS ═══════════ */
+    .treatment-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .treatment-option {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .treatment-option input[type="radio"] {
+      display: none;
+    }
+
+    .treatment-card-clickable {
+      padding: 28px 24px;
+      border: 2px solid rgba(0, 0, 0, 0.08);
+      border-radius: 16px;
+      background: var(--white);
+      transition: all 0.3s var(--ease-gentle);
+      text-align: center;
+    }
+
+    .treatment-option input[type="radio"]:checked + .treatment-card-clickable {
+      border-color: var(--green-mid);
+      background: var(--green-pale);
+      box-shadow: 0 8px 24px rgba(58, 107, 30, 0.15);
+    }
+
+    .treatment-option:hover .treatment-card-clickable {
+      border-color: var(--green-mid);
+      transform: translateY(-2px);
+    }
+
+    .treatment-card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .treatment-card-name {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      color: var(--green-deep);
+      margin: 0;
+      font-weight: 400;
+    }
+
+    .treatment-card-price {
+      font-size: 0.85rem;
+      color: var(--gray-mid);
+      margin-top: 8px;
+    }
+
+    .treatment-option input[type="radio"]:checked + .treatment-card-clickable .treatment-card-name {
+      color: var(--green-deep);
+      font-weight: 500;
+    }
+
+    /* ═══════════ TIME SLOTS ═══════════ */
+    .booking-slots {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 40px;
+    }
+
+    .time-slot {
+      padding: 18px 16px;
+      border: 1.5px solid rgba(0, 0, 0, 0.08);
+      border-radius: 12px;
+      background: var(--white);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s var(--ease-gentle);
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .time-slot:hover {
+      border-color: var(--green-mid);
+      transform: translateY(-2px);
+    }
+
+    .time-slot.selected {
+      border-color: var(--green-mid);
+      background: var(--green-pale);
+      color: var(--green-deep);
+      font-weight: 600;
+      box-shadow: 0 6px 20px rgba(58, 107, 30, 0.15);
+    }
+
+    /* ═══════════ FORM GROUPS BOOKING ═══════════ */
+    .booking-form-group {
+      margin-bottom: 28px;
+    }
+
+    .booking-form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    .booking-form-group input,
+    .booking-form-group textarea {
+      width: 100%;
+      padding: 14px 18px;
+      border: 1.5px solid rgba(0, 0, 0, 0.08);
+      border-radius: 12px;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      background: var(--white);
+      color: var(--text-primary);
+      transition: border-color 0.3s;
+      outline: none;
+    }
+
+    .booking-form-group input:focus,
+    .booking-form-group textarea:focus {
+      border-color: var(--green-mid);
+      box-shadow: 0 0 0 3px rgba(58, 107, 30, 0.08);
+    }
+
+    .booking-form-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    /* ═══════════ FORM NAVIGATION ═══════════ */
+    .form-navigation {
+      display: flex;
+      gap: 16px;
+      margin-top: 60px;
+      justify-content: space-between;
+    }
+
+    .btn-nav {
+      padding: 14px 36px;
+      border-radius: 50px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      border: none;
+      transition: all 0.4s var(--ease-gentle);
+    }
+
+    .btn-back {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1.5px solid rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-back:hover {
+      border-color: var(--green-mid);
+      color: var(--green-mid);
+    }
+
+    .btn-next {
+      background: var(--green-dark);
+      color: var(--gold-pale);
+    }
+
+    .btn-next:hover {
+      background: var(--green-mid);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(45, 80, 22, 0.3);
+    }
+
+    .btn-submit {
+      background: var(--gold);
+      color: var(--white);
+    }
+
+    .btn-submit:hover {
+      background: var(--gold-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(184, 134, 11, 0.3);
+    }
+
+    .btn-nav:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ═══════════ SUMMARY SECTION ═══════════ */
+    .booking-summary {
+      background: var(--gold-cream);
+      padding: 40px;
+      border-radius: 16px;
+      margin-bottom: 40px;
+    }
+
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      font-size: 0.95rem;
+    }
+
+    .summary-item:last-child {
+      border-bottom: none;
+    }
+
+    .summary-label {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .summary-value {
+      color: var(--green-deep);
+      font-weight: 600;
+    }
+
+    /* ═══════════ SIDE PANEL ═══════════ */
+    .booking-sidebar {
+      position: sticky;
+      top: 120px;
+      height: fit-content;
+    }
+
+    .sidebar-card {
+      background: var(--white);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      border-radius: 16px;
+      padding: 32px 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    }
+
+    .sidebar-card h4 {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      color: var(--green-deep);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .sidebar-card p {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin: 0 0 12px 0;
+    }
+
+    .sidebar-card p:last-child {
+      margin-bottom: 0;
+    }
+
+    .sidebar-card ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-card li {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      padding: 8px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .sidebar-card li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--green-mid);
+      font-weight: 700;
+    }
+
+    /* ═══════════ PROGRESS INDICATOR ═══════════ */
+    .progress-steps {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 48px;
+      justify-content: center;
+    }
+
+    .progress-step {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.08);
+      transition: all 0.3s var(--ease-gentle);
+    }
+
+    .progress-step.active {
+      background: var(--gold);
+      width: 40px;
+      border-radius: 6px;
+    }
+
+    .progress-step.completed {
+      background: var(--green-mid);
+    }
+
+    /* ═══════════ CONFIRMATION MESSAGE ═══════════ */
+    .confirmation-message {
+      display: none;
+      text-align: center;
+      padding: 60px 40px;
+    }
+
+    .confirmation-message.active {
+      display: block;
+    }
+
+    .confirmation-icon {
+      font-size: 4rem;
+      margin-bottom: 24px;
+    }
+
+    .confirmation-message h2 {
+      font-size: 2.2rem;
+      margin-bottom: 16px;
+      color: var(--green-deep);
+    }
+
+    .confirmation-message p {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin: 0 auto 40px;
+    }
+
+    /* ═══════════ RESPONSIVE BOOKING ═══════════ */
+    @media (max-width: 1024px) {
+      .booking-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .booking-sidebar {
+        position: static;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+
+      .sidebar-card {
+        margin-bottom: 0;
+      }
+
+      .treatment-options {
+        grid-template-columns: 1fr;
+      }
+
+      .booking-slots {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .booking-container {
+        gap: 32px;
+      }
+
+      .step-title {
+        font-size: 1.6rem;
+      }
+
+      .booking-slots {
+        grid-template-columns: 1fr;
+      }
+
+      .booking-sidebar {
+        grid-template-columns: 1fr;
+      }
+
+      .form-navigation {
+        flex-direction: column-reverse;
+      }
+
+      .btn-nav {
+        width: 100%;
+      }
+
+      .treatment-options {
+        gap: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ NAVIGATION ═══════════ -->
+<nav class="navbar">
+  <div class="container">
+    <a href="index.html" class="nav-brand">
+      <img src="images/logo_green.png" alt="Bodhi & Balance logo">
+      <span class="nav-brand-text">Bodhi & Balance</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="services.html">Treatments</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="booking.html" class="nav-book active">Book a Session</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ═══════════ PAGE HEADER ═══════════ -->
+<section class="page-header">
+  <div class="container">
+    <h1>Book a Session</h1>
+    <p>Begin your journey to healing and inner balance. Choose your treatment and find a time that works best for you.</p>
+  </div>
+</section>
+
+<!-- ═══════════ BOOKING SECTION ═══════════ -->
+<section style="padding: var(--section-padding);">
+  <div class="container">
+    <!-- Progress Indicator -->
+    <div class="progress-steps">
+      <div class="progress-step active" id="progress-1"></div>
+      <div class="progress-step" id="progress-2"></div>
+      <div class="progress-step" id="progress-3"></div>
+      <div class="progress-step" id="progress-4"></div>
+      <div class="progress-step" id="progress-5"></div>
+    </div>
+
+    <div class="booking-container">
+      <!-- MAIN FORM -->
+      <div class="booking-form-wrapper">
+        <form id="bookingForm">
+          <!-- STEP 1: CHOOSE TREATMENT -->
+          <div class="booking-step active" id="step-1">
+            <div class="step-header">
+              <div class="step-number">Step 1 of 5</div>
+              <h2 class="step-title">Choose Your Treatment</h2>
+              <p class="step-description">Select the therapy that speaks to your healing needs.</p>
+            </div>
+
+            <div class="treatment-options">
+              <label class="treatment-option">
+                <input type="radio" name="treatment" value="Reflexology" data-price="75">
+                <div class="treatment-card-clickable">
+                  <span class="treatment-card-icon">🦶</span>
+                  <p class="treatment-card-name">Reflexology</p>
+                  <div class="treatment-card-price">$75 / 60 min</div>
+                </div>
+              </label>
+
+              <label class="treatment-option">
+                <input type="radio" name="treatment" value="Reiki Healing" data-price="85">
+                <div class="treatment-card-clickable">
+                  <span class="treatment-card-icon">✋</span>
+                  <p class="treatment-card-name">Reiki Healing</p>
+                  <div class="treatment-card-price">$85 / 60 min</div>
+                </div>
+              </label>
+
+              <label class="treatment-option">
+                <input type="radio" name="treatment" value="Hot Stone Therapy" data-price="95">
+                <div class="treatment-card-clickable">
+                  <span class="treatment-card-icon">🔥</span>
+                  <p class="treatment-card-name">Hot Stone Therapy</p>
+                  <div class="treatment-card-price">$95 / 75 min</div>
+                </div>
+              </label>
+
+              <label class="treatment-option">
+                <input type="radio" name="treatment" value="Indian Head Massage" data-price="65">
+                <div class="treatment-card-clickable">
+                  <span class="treatment-card-icon">🌸</span>
+                  <p class="treatment-card-name">Indian Head Massage</p>
+                  <div class="treatment-card-price">$65 / 45 min</div>
+                </div>
+              </label>
+
+              <label class="treatment-option">
+                <input type="radio" name="treatment" value="Aromatherapy" data-price="70">
+                <div class="treatment-card-clickable">
+                  <span class="treatment-card-icon">🌿</span>
+                  <p class="treatment-card-name">Aromatherapy</p>
+                  <div class="treatment-card-price">$70 / 50 min</div>
+                </div>
+              </label>
+
+              <label class="treatment-option">
+                <input type="radio" name="treatment" value="Mindful Meditation" data-price="60">
+                <div class="treatment-card-clickable">
+                  <span class="treatment-card-icon">🧘</span>
+                  <p class="treatment-card-name">Mindful Meditation</p>
+                  <div class="treatment-card-price">$60 / 45 min</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- STEP 2: CHOOSE DATE -->
+          <div class="booking-step" id="step-2">
+            <div class="step-header">
+              <div class="step-number">Step 2 of 5</div>
+              <h2 class="step-title">Choose Your Date</h2>
+              <p class="step-description">Select a date that works best for your schedule.</p>
+            </div>
+
+            <div class="booking-form-group">
+              <label for="bookingDate">Preferred Date</label>
+              <input type="date" id="bookingDate" name="date" required>
+            </div>
+          </div>
+
+          <!-- STEP 3: CHOOSE TIME -->
+          <div class="booking-step" id="step-3">
+            <div class="step-header">
+              <div class="step-number">Step 3 of 5</div>
+              <h2 class="step-title">Choose Your Time</h2>
+              <p class="step-description">Pick a time slot that suits you best.</p>
+            </div>
+
+            <div class="booking-slots" id="timeSlots">
+              <button type="button" class="time-slot" data-time="9:00">9:00 AM</button>
+              <button type="button" class="time-slot" data-time="10:30">10:30 AM</button>
+              <button type="button" class="time-slot" data-time="12:00">12:00 PM</button>
+              <button type="button" class="time-slot" data-time="14:00">2:00 PM</button>
+              <button type="button" class="time-slot" data-time="15:30">3:30 PM</button>
+              <button type="button" class="time-slot" data-time="17:00">5:00 PM</button>
+            </div>
+          </div>
+
+          <!-- STEP 4: YOUR DETAILS -->
+          <div class="booking-step" id="step-4">
+            <div class="step-header">
+              <div class="step-number">Step 4 of 5</div>
+              <h2 class="step-title">Your Details</h2>
+              <p class="step-description">Help us personalize your healing experience.</p>
+            </div>
+
+            <div class="booking-form-group">
+              <label for="fullName">Full Name</label>
+              <input type="text" id="fullName" name="fullName" required>
+            </div>
+
+            <div class="booking-form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="booking-form-group">
+              <label for="phone">Phone Number</label>
+              <input type="tel" id="phone" name="phone" required>
+            </div>
+
+            <div class="booking-form-group">
+              <label for="notes">Health Conditions & Notes (Optional)</label>
+              <textarea id="notes" name="notes" placeholder="Let us know about any health conditions or preferences we should be aware of..."></textarea>
+            </div>
+          </div>
+
+          <!-- STEP 5: CONFIRMATION -->
+          <div class="booking-step" id="step-5">
+            <div class="step-header">
+              <div class="step-number">Step 5 of 5</div>
+              <h2 class="step-title">Confirm Your Booking</h2>
+              <p class="step-description">Review your appointment details below.</p>
+            </div>
+
+            <div class="booking-summary">
+              <div class="summary-item">
+                <span class="summary-label">Treatment:</span>
+                <span class="summary-value" id="summaryTreatment">—</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Date:</span>
+                <span class="summary-value" id="summaryDate">—</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Time:</span>
+                <span class="summary-value" id="summaryTime">—</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Name:</span>
+                <span class="summary-value" id="summaryName">—</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Email:</span>
+                <span class="summary-value" id="summaryEmail">—</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Price:</span>
+                <span class="summary-value" id="summaryPrice">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CONFIRMATION MESSAGE -->
+          <div class="confirmation-message fade-in" id="confirmationMessage">
+            <div class="confirmation-icon">✓</div>
+            <h2>Booking Confirmed!</h2>
+            <p>Thank you for scheduling your session with Bodhi & Balance. A confirmation email has been sent to you. We look forward to welcoming you.</p>
+            <a href="index.html" class="btn btn-gold">Return to Home</a>
+          </div>
+
+          <!-- FORM NAVIGATION -->
+          <div class="form-navigation" id="formNav">
+            <button type="button" class="btn-nav btn-back" id="backBtn" style="display: none;">← Back</button>
+            <button type="button" class="btn-nav btn-next" id="nextBtn">Next →</button>
+            <button type="submit" class="btn-nav btn-submit" id="submitBtn" style="display: none;">Confirm Booking</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- SIDEBAR -->
+      <aside class="booking-sidebar fade-in">
+        <div class="sidebar-card">
+          <h4>📋 Cancellation Policy</h4>
+          <p>We understand life happens. Cancellations made 24 hours in advance receive a full refund. Late cancellations are subject to a 50% fee.</p>
+        </div>
+
+        <div class="sidebar-card">
+          <h4>🎒 What to Bring</h4>
+          <ul>
+            <li>Valid ID for first-time clients</li>
+            <li>Arrive 10 minutes early</li>
+            <li>Comfortable, loose clothing</li>
+            <li>Any relevant medical documents</li>
+          </ul>
+        </div>
+
+        <div class="sidebar-card">
+          <h4>✨ Arrival Guidance</h4>
+          <p>Our peaceful space is designed to welcome you into relaxation the moment you arrive. Please allow time to settle in and enjoy a cup of herbal tea before your session begins.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="images/logo_gold_v2.png" alt="Bodhi & Balance">
+        <p>Holistic therapies rooted in the ancient wisdom of Buddhist philosophy. Nurturing body, mind, and spirit towards lasting balance.</p>
+      </div>
+      <div>
+        <h4>Treatments</h4>
+        <ul>
+          <li><a href="services.html">Reflexology</a></li>
+          <li><a href="services.html">Reiki Healing</a></li>
+          <li><a href="services.html">Aromatherapy</a></li>
+          <li><a href="services.html">Hot Stone Therapy</a></li>
+          <li><a href="services.html">Meditation</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="booking.html">Book Online</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Opening Hours</h4>
+        <ul>
+          <li>Mon — Fri: 9am – 7pm</li>
+          <li>Saturday: 9am – 5pm</li>
+          <li>Sunday: 10am – 3pm</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2025 Bodhi & Balance. All rights reserved.</span>
+      <span>Crafted with mindfulness</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+  // ═══════════ BOOKING FORM JAVASCRIPT ═══════════
+
+  const form = document.getElementById('bookingForm');
+  const steps = document.querySelectorAll('.booking-step');
+  const progressSteps = document.querySelectorAll('.progress-step');
+  const nextBtn = document.getElementById('nextBtn');
+  const backBtn = document.getElementById('backBtn');
+  const submitBtn = document.getElementById('submitBtn');
+  const formNav = document.getElementById('formNav');
+  const timeSlots = document.querySelectorAll('.time-slot');
+  const confirmationMessage = document.getElementById('confirmationMessage');
+
+  let currentStep = 1;
+  let formData = {
+    treatment: '',
+    date: '',
+    time: '',
+    fullName: '',
+    email: '',
+    phone: '',
+    notes: '',
+    price: ''
+  };
+
+  // Initialize date input with minimum date (today)
+  const dateInput = document.getElementById('bookingDate');
+  const today = new Date().toISOString().split('T')[0];
+  dateInput.min = today;
+
+  // Time slot selection
+  timeSlots.forEach(slot => {
+    slot.addEventListener('click', (e) => {
+      e.preventDefault();
+      timeSlots.forEach(s => s.classList.remove('selected'));
+      slot.classList.add('selected');
+      formData.time = slot.dataset.time;
+    });
+  });
+
+  // Treatment selection
+  const treatmentInputs = document.querySelectorAll('input[name="treatment"]');
+  treatmentInputs.forEach(input => {
+    input.addEventListener('change', (e) => {
+      formData.treatment = e.target.value;
+      formData.price = e.target.dataset.price;
+    });
+  });
+
+  // Date selection
+  dateInput.addEventListener('change', (e) => {
+    formData.date = e.target.value;
+  });
+
+  // Personal details
+  document.getElementById('fullName').addEventListener('change', (e) => {
+    formData.fullName = e.target.value;
+  });
+  document.getElementById('email').addEventListener('change', (e) => {
+    formData.email = e.target.value;
+  });
+  document.getElementById('phone').addEventListener('change', (e) => {
+    formData.phone = e.target.value;
+  });
+  document.getElementById('notes').addEventListener('change', (e) => {
+    formData.notes = e.target.value;
+  });
+
+  // Show step function
+  function showStep(stepNum) {
+    steps.forEach(step => step.classList.remove('active'));
+    steps[stepNum - 1].classList.add('active');
+
+    // Update progress
+    progressSteps.forEach((step, index) => {
+      step.classList.remove('active', 'completed');
+      if (index < stepNum - 1) {
+        step.classList.add('completed');
+      } else if (index === stepNum - 1) {
+        step.classList.add('active');
+      }
+    });
+
+    // Show/hide buttons
+    backBtn.style.display = currentStep === 1 ? 'none' : 'block';
+    nextBtn.style.display = currentStep === 5 ? 'none' : 'block';
+    submitBtn.style.display = currentStep === 5 ? 'block' : 'none';
+
+    // Update summary on step 5
+    if (stepNum === 5) {
+      updateSummary();
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Update summary display
+  function updateSummary() {
+    document.getElementById('summaryTreatment').textContent = formData.treatment || '—';
+
+    if (formData.date) {
+      const dateObj = new Date(formData.date + 'T00:00:00');
+      const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('summaryDate').textContent = dateStr;
+    }
+
+    document.getElementById('summaryTime').textContent = formData.time || '—';
+    document.getElementById('summaryName').textContent = formData.fullName || '—';
+    document.getElementById('summaryEmail').textContent = formData.email || '—';
+    document.getElementById('summaryPrice').textContent = formData.price ? '$' + formData.price : '—';
+  }
+
+  // Validation function
+  function isStepValid(stepNum) {
+    switch(stepNum) {
+      case 1:
+        return formData.treatment !== '';
+      case 2:
+        return formData.date !== '';
+      case 3:
+        return formData.time !== '';
+      case 4:
+        return formData.fullName !== '' && formData.email !== '' && formData.phone !== '';
+      case 5:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  // Next button
+  nextBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (isStepValid(currentStep)) {
+      currentStep++;
+      showStep(currentStep);
+    } else {
+      alert('Please complete all required fields in this step.');
+    }
+  });
+
+  // Back button
+  backBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    currentStep--;
+    showStep(currentStep);
+  });
+
+  // Form submission
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    if (isStepValid(currentStep)) {
+      // Hide form and show confirmation
+      document.querySelectorAll('.booking-step').forEach(step => {
+        step.style.display = 'none';
+      });
+      formNav.style.display = 'none';
+      confirmationMessage.classList.add('active');
+      document.querySelector('.booking-sidebar').style.display = 'none';
+
+      // Log the booking data (in real scenario, would send to server)
+      console.log('Booking confirmed:', formData);
+    }
+  });
+
+  // Initialize
+  showStep(currentStep);
+</script>
+</body>
+</html>

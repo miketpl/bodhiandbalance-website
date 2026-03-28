@@ -1,0 +1,10 @@
+.DS_Store
+*.swp
+*~
+.env
+node_modules/
+images/panel*_debug.png
+images/logo.svg
+images/logo_gold.png
+images/logo_hero.png
+images/logo_transparent.png
